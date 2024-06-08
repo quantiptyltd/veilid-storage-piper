@@ -4,3 +4,16 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+
+# Dependencies for anything other than wasm
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "macros"] }
+veilid-core = { git = "https://gitlab.com/debanjanbasu/veilid.git", branch = "main" }
+
+# Dependencies for wasm
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.92"
+tokio_with_wasm = "0.4.5"
+veilid-core = { git = "https://gitlab.com/debanjanbasu/veilid.git", branch = "main", default-features = false, features = [
+    "default-wasm",
+] }
