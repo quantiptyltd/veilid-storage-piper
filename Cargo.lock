@@ -3574,6 +3574,7 @@ dependencies = [
 name = "veilid-storage-piper"
 version = "0.1.0"
 dependencies = [
+ "eyre",
  "tokio",
  "tokio_with_wasm",
  "veilid-core",
