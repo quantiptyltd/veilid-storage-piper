@@ -1,2 +1,1 @@
-mod processors;
-mod blob_master;
+pub mod processors;
