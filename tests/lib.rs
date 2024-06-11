@@ -9,8 +9,18 @@ mod tests {
     use veilid_storage_piper::processors::compressor_zstd::CompressorZstd;
 
     #[test]
-    fn create_compress_zstd() -> Result<()> {
-        let file_name = "./tests/av1-test-video.webm";
+    fn test_video_compression() -> Result<()> {
+        compress("./tests/av1-test-video.webm")?;  
+        Ok(())
+    }
+
+    #[test]
+    fn test_text_compression() -> Result<()> {
+        compress("./tests/text-file-random.txt")?;  
+        Ok(())  
+    }
+
+    fn compress(file_name: &str) -> Result<()> {
         // Create a bufstream from an input file
         let input_file = File::open(file_name)?;
         let input_buf = BufReader::new(input_file);
