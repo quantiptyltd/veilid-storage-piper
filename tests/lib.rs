@@ -10,14 +10,14 @@ mod tests {
 
     #[test]
     fn test_video_compression() -> Result<()> {
-        compress("./tests/av1-test-video.webm")?;  
+        compress("./tests/av1-test-video.webm")?;
         Ok(())
     }
 
     #[test]
     fn test_text_compression() -> Result<()> {
-        compress("./tests/text-file-random.txt")?;  
-        Ok(())  
+        compress("./tests/text-file-random.txt")?;
+        Ok(())
     }
 
     fn compress(file_name: &str) -> Result<()> {

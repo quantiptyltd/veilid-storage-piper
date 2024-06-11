@@ -1,15 +1,18 @@
-use std::{io::{self, BufReader, BufWriter, Read, Write}, thread::available_parallelism};
+use std::{
+    io::{self, BufReader, BufWriter, Read, Write},
+    thread::available_parallelism,
+};
 
 use eyre::{Ok, Result};
 
 #[derive(Debug)]
-pub struct CompressorZstd<R: Read, W : Write> {
+pub struct CompressorZstd<R: Read, W: Write> {
     level: i32,
     input_buf: BufReader<R>,
     output_buf: BufWriter<W>,
 }
 
-impl<R: Read, W : Write> CompressorZstd<R, W> {
+impl<R: Read, W: Write> CompressorZstd<R, W> {
     pub fn new(input_buf: BufReader<R>, output_buf: BufWriter<W>, level: i32) -> Self {
         Self {
             level,
