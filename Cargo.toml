@@ -5,7 +5,8 @@ edition = "2021"
 
 [dependencies]
 eyre = "0.6.12"
-zstd = { version = "0.13.1", features = ["zstdmt"] }
+lz4_flex = { version = "0.11", default-features = false, features = ["frame"] }
+futures = "0.3.30"
 
 # Dependencies for anything other than wasm
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
@@ -20,7 +21,7 @@ veilid-core = { git = "https://gitlab.com/debanjanbasu/veilid.git", branch = "ma
 # Dependencies for wasm
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "0.2.92"
-tokio_with_wasm = "0.5.1"
+tokio_with_wasm = "0.5.3"
 veilid-core = { git = "https://gitlab.com/debanjanbasu/veilid.git", branch = "main", default-features = false, features = [
     "default-wasm",
 ] }

@@ -4,6 +4,7 @@ use std::{
 };
 
 use eyre::{Ok, Result};
+use lz4_flex::frame::FrameEncoder;
 
 #[derive(Debug)]
 pub struct CompressorZstd<R: Read, W: Write> {
@@ -21,13 +22,14 @@ impl<R: Read, W: Write> CompressorZstd<R, W> {
         }
     }
 
-    pub fn process(&mut self) -> Result<()> {
+    pub async fn process(&mut self) -> Result<()> {
         // Get the no of threads, for us to parallelize
-        let n_workers = available_parallelism()?.get().try_into()?;
-        let mut encoder = zstd::stream::Encoder::new(&mut self.output_buf, self.level)?;
+        // let n_workers = available_parallelism()?.get().try_into()?;
+        let encoder = FrameEncoder::new(&mut self.output_buf);
+        // let mut encoder = zstd::stream::Encoder::new(&mut self.output_buf, self.level)?;
         // Enable multithreading
-        encoder.multithread(n_workers)?;
-        // Start the compression
+        // encoder.multithread(n_workers)?;
+        // Start the compression - ensure to auto_finish to ensure the stream is finished before being dropped
         io::copy(&mut self.input_buf, &mut encoder.auto_finish())?;
         Ok(())
     }
