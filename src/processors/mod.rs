@@ -1,1 +1,1 @@
-pub mod compressor_zstd;
+pub mod brotli;
