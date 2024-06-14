@@ -6,7 +6,7 @@ mod tests {
 
     use std::{
         fs::File,
-        io::{BufReader, BufWriter},
+        io::{copy, BufReader, BufWriter},
     };
 
     #[cfg(target_arch = "wasm32")]
@@ -33,11 +33,11 @@ mod tests {
         let output_file = File::create(format!("{}.br", file_name))?;
         let output_buf = BufWriter::new(output_file);
 
-        // Initialize the stream brotli compressor
-        let mut compressor_brotli = Brotli::new(input_buf, output_buf, 11);
+        // Initialize the stream brotli compressor - maximum compression
+        let mut compressor_brotli = Brotli::new(input_buf, output_buf);
 
-        // Start processing
-        compressor_brotli.compress().await?;
+        // Start processing - copy the streams
+        copy(&mut compressor_brotli.input, &mut compressor_brotli.output)?;
 
         Ok(())
     }
