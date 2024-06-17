@@ -1,25 +1,33 @@
-use brotli::{enc::BrotliEncoderParams, CompressorWriter};
+use brotli::{enc::BrotliEncoderParams, BrotliCompress, BrotliDecompress};
 use std::io::{Read, Write};
 
-pub struct Brotli<R: Read, W: Write> {
-    pub input: R,
-    pub output: CompressorWriter<W>,
+pub struct Brotli<'a, R: Read, W: Write> {
+    pub input: &'a mut R,
+    pub output: &'a mut W,
 }
 
-impl<R: Read, W: Write> Brotli<R, W> {
-    pub fn new(input: R, output: W) -> Self {
+impl<'a, R: Read, W: Write> Brotli<'a, R, W> {
+    pub fn compress(input: &'a mut R, output: &'a mut W) -> Self {
         // Modify params to fit the application needs
         let mut brotli_encoder_params = BrotliEncoderParams::default();
         // Level is between 0-11, we always set it to 11, as it's minimal overhead for us
         brotli_encoder_params.quality = 11;
 
-        // Create a compression output writer for streaming - 4096 bytes buffer
-        let comp_out_writer = CompressorWriter::with_params(output, 4096, &brotli_encoder_params);
-
-        // Return the comp_out_writer as output
-        Self {
-            input,
-            output: comp_out_writer,
+        // Mutate the streams with compression
+        if let Err(e) = BrotliCompress(input, output, &brotli_encoder_params) {
+            eprintln!("Error during brotli compression: {:?}", e);
         }
+
+        // Return self
+        Self { input, output }
+    }
+    pub fn decompress(input: &'a mut R, output: &'a mut W) -> Self {
+        // Mutate the streams with compression
+        if let Err(e) = BrotliDecompress(input, output) {
+            eprintln!("Error during brotli decompression: {:?}", e);
+        }
+
+        // Return self
+        Self { input, output }
     }
 }
