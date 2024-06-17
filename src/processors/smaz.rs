@@ -1,4 +1,5 @@
 use std::io::{Read, Write};
+use eyre::{Result, Ok};
 
 pub struct Smaz<'a, 'b, R: Read, W: Write> {
     pub input: &'a mut R,
@@ -6,11 +7,13 @@ pub struct Smaz<'a, 'b, R: Read, W: Write> {
 }
 
 impl<'a, 'b, R: Read, W: Write> Smaz<'a, 'b, R, W> {
-    pub fn compress(input: &'a mut R, output: &'b mut W) -> Self {
+    pub fn compress(input: &'a mut R, output: &'b mut W) -> Result<()> {
         // Mutate the streams with SMAZ compression
-        // Callback for every buffer read
-        // output.by_ref().write_fmt(fmt)
-        Self { input, output }
+        let mut smazzed_output = Vec::new();
+        input.read_to_end(&mut smazzed_output)?;
+        smazzed_output = fast_smaz::compress(&smazzed_output);
+        output.write_all(&smazzed_output)?;
+        Ok(())
     }
 
     pub fn decompress(input: &'a mut R, output: &'b mut W) -> Self {
