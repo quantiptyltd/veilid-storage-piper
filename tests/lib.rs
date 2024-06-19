@@ -2,7 +2,7 @@
 mod tests {
     use eyre::{Ok, Result};
 
-    use veilid_storage_piper::processors::brotli::Brotli;
+    use veilid_storage_piper::processors::{brotli::Brotli, Processor};
 
     use std::{
         fs::File,
@@ -41,7 +41,8 @@ mod tests {
         let mut output_buf = BufWriter::new(output_file);
 
         // Initialize the stream brotli compressor - maximum compression level of 11
-        Brotli::compress(&mut input_buf, &mut output_buf);
+        let mut processor = Brotli::new(&mut input_buf, &mut output_buf);
+        processor.modulate();
 
         // Start processing - copy the streams
         copy(&mut input_buf, &mut output_buf)?;
@@ -57,7 +58,8 @@ mod tests {
         let mut output_buf = BufWriter::new(output_file);
 
         // Initialize the stream brotli decompressor
-        Brotli::decompress(&mut input_buf, &mut output_buf);
+        let mut processor = Brotli::new(&mut input_buf, &mut output_buf);
+        processor.demodulate();
 
         // Start processing - copy the streams
         copy(&mut input_buf, &mut output_buf)?;
