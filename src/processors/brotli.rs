@@ -1,5 +1,5 @@
 use brotli::{enc::BrotliEncoderParams, BrotliCompress, BrotliDecompress};
-use std::io::{Read, Write};
+use std::io::{BufReader, Read, Write};
 
 use super::Processor;
 
@@ -8,6 +8,21 @@ pub struct Brotli<R, W> {
     output: W,
 }
 
+// Implement a public method for Brotli
+impl<R: Read, W: Write> Brotli<R, W> {
+    pub fn should_process(input: &mut R) -> bool {
+        // Check using infer crate if the file type is video
+        // If yes, then return false, as we don't want to process video files
+        let kind = infer::get(BufReader::new(input).buffer()).expect("file type is known");
+        if kind.mime_type().contains("video") {
+            return false;
+        }
+        // Otherwise, return true
+        true
+    }
+}
+
+// Implement the Processor trait for Brotli
 impl<R: Read, W: Write> Processor<R, W> for Brotli<R, W> {
     fn new(input: R, output: W) -> Self {
         Self { input, output }
