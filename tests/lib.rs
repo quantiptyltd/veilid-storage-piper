@@ -29,6 +29,7 @@ mod tests {
     async fn test_text_decompression() -> Result<()> {
         compress(TEXT_FILE).await?; // Run the compression test first
         decompress(&format!("{}.br", TEXT_FILE)).await?;
+        // TODO: Compare the hashes of the input and .br.decomp files
         Ok(())
     }
 
@@ -39,11 +40,11 @@ mod tests {
         let output_file = File::create(format!("{}.br", file_name))?;
         let mut output_buf = BufWriter::new(output_file);
 
-        // Initialize the stream brotli compressor - maximum compression
-        let mut compressor_brotli = Brotli::compress(&mut input_buf, &mut output_buf);
+        // Initialize the stream brotli compressor - maximum compression level of 11
+        Brotli::compress(&mut input_buf, &mut output_buf);
 
         // Start processing - copy the streams
-        copy(&mut compressor_brotli.input, &mut compressor_brotli.output)?;
+        copy(&mut input_buf, &mut output_buf)?;
 
         Ok(())
     }
@@ -56,10 +57,10 @@ mod tests {
         let mut output_buf = BufWriter::new(output_file);
 
         // Initialize the stream brotli decompressor
-        let mut compressor_brotli = Brotli::decompress(&mut input_buf, &mut output_buf);
+        Brotli::decompress(&mut input_buf, &mut output_buf);
 
         // Start processing - copy the streams
-        copy(&mut compressor_brotli.input, &mut compressor_brotli.output)?;
+        copy(&mut input_buf, &mut output_buf)?;
 
         Ok(())
     }

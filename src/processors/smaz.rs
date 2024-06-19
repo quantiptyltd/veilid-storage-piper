@@ -1,5 +1,5 @@
+use eyre::{Ok, Result};
 use std::io::{Read, Write};
-use eyre::{Result, Ok};
 
 pub struct Smaz<'a, 'b, R: Read, W: Write> {
     pub input: &'a mut R,
