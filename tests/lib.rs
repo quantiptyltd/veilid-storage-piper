@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
     use eyre::{Ok, Result};
-    use veilid_storage_piper::upload;
     use std::{
         fs::File,
         io::{BufReader, BufWriter},
     };
+    use veilid_storage_piper::upload;
 
     #[cfg(target_arch = "wasm32")]
     use async_std::test;
@@ -47,26 +47,21 @@ mod tests {
         let output_file = File::create(format!("{}.comp", file_name))?;
         let mut output_buf = BufWriter::new(output_file);
 
-        // Initialize the stream brotli compressor - maximum compression level of 11
+        // Initialize the file upload
         upload(&mut input_buf, &mut output_buf)?;
 
         Ok(())
     }
 
-    async fn decompress(file_name: &str) -> Result<()> {
-        // // Create a bufstream from an input file
-        // let input_file = File::open(file_name)?;
-        // let mut input_buf = BufReader::new(input_file);
-        // let output_file = File::create(format!("{}.decomp", file_name))?;
-        // let mut output_buf = BufWriter::new(output_file);
+    // async fn decompress(file_name: &str) -> Result<()> {
+    //     // Create a bufstream from an input file
+    //     let input_file = File::open(file_name)?;
+    //     let mut input_buf = BufReader::new(input_file);
+    //     let output_file = File::create(format!("{}.decomp", file_name))?;
+    //     let mut output_buf = BufWriter::new(output_file);
 
-        // // Initialize the stream brotli decompressor
-        // let mut processor = Brotli::new(&mut input_buf, &mut output_buf);
-        // processor.demodulate();
+    //     // Initialize the stream brotli decompressor
 
-        // // Start processing - copy the streams
-        // copy(&mut input_buf, &mut output_buf)?;
-
-        Ok(())
-    }
+    //     Ok(())
+    // }
 }

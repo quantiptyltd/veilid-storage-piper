@@ -1,7 +1,7 @@
 use crate::Processor;
 use brotli::{enc::BrotliEncoderParams, BrotliCompress, BrotliDecompress};
 use eyre::{Ok, Result};
-use std::io::{Read, Write};
+use std::io::{Read, Seek, Write};
 
 pub struct Brotli<'a, R, W> {
     input: &'a mut R,
@@ -9,10 +9,12 @@ pub struct Brotli<'a, R, W> {
 }
 
 // Implement a public method for Brotli
-pub fn should_process<R: Read>(input: &mut R) -> Result<bool> {
+pub fn should_process<R: Read + Seek>(input: &mut R) -> Result<bool> {
     let mut buffer = Vec::new();
     // Read 1024 bytes off the file
     input.take(1024).read_to_end(&mut buffer)?;
+    // Rewind to be consumed for later
+    input.rewind()?;
     // If the input is a video, we don't want to process it
     if infer::is_video(&buffer) {
         return Ok(false);
