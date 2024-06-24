@@ -1,6 +1,6 @@
 use crate::Processor;
 use eyre::{Ok, Result};
-use std::io::{Read, Write};
+use std::io::{BufReader, Read, Write};
 use fast_smaz::{compress,decompress};
 
 pub struct Smaz<'a, R, W> {
@@ -28,16 +28,12 @@ impl<'a, R: Read, W: Write> Processor<'a, R, W> for Smaz<'a, R, W> {
     }
 
     fn modulate(&mut self) -> Result<()> {
-        let mut input_string = String::new();
-        self.input.read_to_string(&mut input_string)?;
-        self.output.write_all(&compress(&input_string))?;
+        
         Ok(())
     }
 
     fn demodulate(&mut self) -> Result<()> {
-        let mut input_string = String::new();
-        self.input.read_to_string(&mut input_string)?;
-        self.output.write_all(&decompress(&input_string)?)?;
+        
         Ok(())
     }
 }
