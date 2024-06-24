@@ -3,7 +3,7 @@ pub mod processors;
 use eyre::Result;
 use processors::brotli::{self, Brotli};
 use processors::smaz::{self, Smaz};
-use std::io::{Read, Seek, Write};
+use std::io::{copy, Read, Seek, Write};
 
 pub trait Processor<'a, R, W> {
     fn new(input: &'a mut R, output: &'a mut W) -> Self;
@@ -44,6 +44,9 @@ pub fn upload<R: Read + Seek, W: Write>(input: &mut R, output: &mut W) -> Result
             }
         }
     }
+
+    // Without copy brotli compression wouldn't be triggered
+    copy(input, output)?;
 
     Ok(())
 }
