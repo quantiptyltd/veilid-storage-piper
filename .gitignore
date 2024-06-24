@@ -3,4 +3,5 @@
 *.lz4
 *.zstd
 *.br
+*.comp
 *.br.decomp

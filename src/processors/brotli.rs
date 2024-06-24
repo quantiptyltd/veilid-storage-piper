@@ -1,49 +1,45 @@
+use crate::Processor;
 use brotli::{enc::BrotliEncoderParams, BrotliCompress, BrotliDecompress};
-use std::io::{BufReader, Read, Write};
+use eyre::{Ok, Result};
+use std::io::{Read, Write};
 
-use super::Processor;
-
-pub struct Brotli<R, W> {
-    input: R,
-    output: W,
+pub struct Brotli<'a, R, W> {
+    input: &'a mut R,
+    output: &'a mut W,
 }
 
 // Implement a public method for Brotli
-impl<R: Read, W: Write> Brotli<R, W> {
-    pub fn should_process(input: &mut R) -> bool {
-        // Check using infer crate if the file type is video
-        // If yes, then return false, as we don't want to process video files
-        let kind = infer::get(BufReader::new(input).buffer()).expect("file type is known");
-        if kind.mime_type().contains("video") {
-            return false;
-        }
-        // Otherwise, return true
-        true
+pub fn should_process<R: Read>(input: &mut R) -> Result<bool> {
+    let mut buffer = Vec::new();
+    // Read 1024 bytes off the file
+    input.take(1024).read_to_end(&mut buffer)?;
+    // If the input is a video, we don't want to process it
+    if infer::is_video(&buffer) {
+        return Ok(false);
     }
+    Ok(true)
 }
 
 // Implement the Processor trait for Brotli
-impl<R: Read, W: Write> Processor<R, W> for Brotli<R, W> {
-    fn new(input: R, output: W) -> Self {
+impl<'a, R: Read, W: Write> Processor<'a, R, W> for Brotli<'a, R, W> {
+    fn new(input: &'a mut R, output: &'a mut W) -> Self {
         Self { input, output }
     }
 
-    fn modulate(&mut self) {
+    fn modulate(&mut self) -> Result<()> {
         // Modify params to fit the application needs
         let mut brotli_encoder_params = BrotliEncoderParams::default();
         // Level is between 0-11, we always set it to 11, as it's minimal overhead for us
         brotli_encoder_params.quality = 11;
 
         // Mutate the streams with compression
-        if let Err(e) = BrotliCompress(&mut self.input, &mut self.output, &brotli_encoder_params) {
-            eprintln!("Error during brotli compression: {:?}", e);
-        }
+        BrotliCompress(&mut self.input, &mut self.output, &brotli_encoder_params)?;
+        Ok(())
     }
 
-    fn demodulate(&mut self) {
+    fn demodulate(&mut self) -> Result<()> {
         // Mutate the streams with compression
-        if let Err(e) = BrotliDecompress(&mut self.input, &mut self.output) {
-            eprintln!("Error during brotli decompression: {:?}", e);
-        }
+        BrotliDecompress(&mut self.input, &mut self.output)?;
+        Ok(())
     }
 }
