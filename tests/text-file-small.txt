@@ -1,1 +1,1 @@
-this is an example of what works very well with smaz
+This is an example of what works very well with smaz. This is to simulate a small message, which can be simple texts. There wouldn't be encrypted, but certainly can be something.

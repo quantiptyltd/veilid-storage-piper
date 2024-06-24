@@ -1,6 +1,7 @@
 use crate::Processor;
 use eyre::{Ok, Result};
 use fast_smaz::{compress, decompress};
+use infer::get as inferget;
 use std::io::{Read, Seek, Write};
 
 pub struct Smaz<'a, R, W> {
@@ -15,8 +16,8 @@ pub fn should_process<R: Read + Seek>(input: &mut R) -> Result<bool> {
     input.take(1024).read_to_end(&mut buffer)?;
     // Rewind to be consumed for later
     input.rewind()?;
-    // Smaz if it's a small string less than 1024 bytes
-    if buffer.len() < 1024 {
+    // Smaz if it's a small string less than 1024 bytes and possibly text
+    if buffer.len() < 1024 && inferget(&buffer).is_none() {
         return Ok(true);
     }
     // Otherwise, return false
